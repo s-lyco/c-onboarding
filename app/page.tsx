@@ -1,52 +1,95 @@
-import Image from 'next/image'
+"use client"; // Import the "client" module (if available, this depends on the context)
+
+import { useEffect } from "react"; // Import the "useEffect" hook from the "react" library
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
- <script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId            : '650341763798014',
-      autoLogAppEvents : true,
-      xfbml            : true,
-      version          : 'v17.0'
+  // Function to initialize the Facebook SDK
+  const initFacebookSDK = () => {
+    return new Promise((resolve, reject) => {
+      // Initialize the Facebook SDK when it's loaded
+      window.fbAsyncInit = function () {
+        window.FB.init({
+          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID, //  Facebook App ID
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: "v17.0", // Specify the SDK version
+        });
+        resolve(); // Resolve the promise when initialization is complete
+      };
+
+      // Load the Facebook SDK asynchronously
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js"; // SDK script URL
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
     });
   };
-</script>
-<script async defer crossorigin="anonymous"
-  src="https://connect.facebook.net/en_US/sdk.js">
-</script>
 
-
-      <script>
-  // Facebook Login with JavaScript SDK
-  function launchWhatsAppSignup() {
-    // Launch Facebook login
-    FB.login(function (response) {
-      if (response.authResponse) {
-        const accessToken = response.authResponse.accessToken;
-        //Use this token to call the debug_token API and get the shared WABA's ID
-      } else {
-        console.log('User cancelled login or did not fully authorize.');
+  useEffect(() => {
+    // Initialize the Facebook SDK when the component is mounted
+    const initializeSDK = async () => {
+      try {
+        await initFacebookSDK(); // Wait for the SDK initialization to complete
+      } catch (error) {
+        console.error("Error initializing Facebook SDK:", error);
       }
-    }, {
-      scope: 'whatsapp_business_management',
-      extras: {
-        feature: 'whatsapp_embedded_signup',
-        setup: {
-          ... // Prefilled data can go here
+    };
+
+    initializeSDK();
+  }, []); // An empty dependency array ensures the effect runs once after the initial render
+
+  const launchWhatsAppSignup = () => {
+    // Launch Facebook login with WhatsApp permissions
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          const accessToken = response.authResponse.accessToken;
+          console.log(accessToken); // Log the access token to the console
+        } else {
+          console.log("User cancelled login or did not fully authorize.");
         }
+      },
+      {
+        scope: "whatsapp_business_management", // Request WhatsApp permissions
+        extras: {
+          feature: "whatsapp_embedded_signup",
+          setup: {
+            // ... Prefilled data can go here
+          },
+        },
       }
-    });
-  }
-</script>
-<div>
-<button onclick="launchWhatsAppSignup()"
-  style="background-color: #1877f2; border: 0; border-radius: 4px; color: #fff; cursor: pointer; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; height: 40px; padding: 0 24px;">
-  Login with Facebook
-</button>
-      
-      </div>
-    </main>
-  )
+    );
+  };
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <button
+        onClick={launchWhatsAppSignup}
+        style={{
+          backgroundColor: "#1877f2",
+          borderRadius: "4px",
+          color: "#fff",
+          cursor: "pointer",
+          fontFamily: "Helvetica, Arial, sans-serif",
+          fontSize: "20px",
+          padding: "0 24px",
+        }}
+      >
+        Login with Facebook
+      </button>
+    </div>
+  );
 }
