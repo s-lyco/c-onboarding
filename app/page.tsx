@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 
 declare global {
@@ -10,44 +10,33 @@ declare global {
 }
 
 export default function Home() {
+  const [fbLoaded, setFbLoaded] = useState(false);
+
   useEffect(() => {
     // Load Facebook SDK
-    const loadFacebookSDK = async () => {
-      try {
-        // Check if FB object exists, and if it does, don't load the SDK again
-        if (window.FB) {
-          return;
-        }
+    if (!fbLoaded) {
+      const script = document.createElement("script");
+      script.src = "https://connect.facebook.net/en_US/sdk.js";
+      script.async = true;
+      script.defer = true;
+      script.crossOrigin = "anonymous";
 
-        const script = document.createElement("script");
-        script.src = "https://connect.facebook.net/en_US/sdk.js";
-        script.async = true;
-        script.defer = true;
-        script.crossOrigin = "anonymous";
-
-        script.onload = () => {
-          // Initialize Facebook SDK
-          window.fbAsyncInit = function () {
-            window.FB.init({
-              appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
-              autoLogAppEvents: true,
-              xfbml: true,
-              version: "v13.0",
-            });
-
-            // Now that the SDK is initialized, you can call FB.login here if needed
-            launchWhatsAppSignup();
-          };
+      script.onload = () => {
+        // Initialize Facebook SDK
+        window.fbAsyncInit = function () {
+          window.FB.init({
+            appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+            autoLogAppEvents: true,
+            xfbml: true,
+            version: "v13.0",
+          });
+          setFbLoaded(true); // Set the flag to indicate that the SDK has loaded
         };
+      };
 
-        document.head.appendChild(script);
-      } catch (error) {
-        console.error("Failed to load Facebook SDK", error);
-      }
-    };
-
-    loadFacebookSDK();
-  }, []);
+      document.head.appendChild(script);
+    }
+  }, [fbLoaded]);
 
   // Facebook Login with JavaScript SDK
   function launchWhatsAppSignup() {
