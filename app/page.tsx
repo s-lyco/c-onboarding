@@ -47,7 +47,10 @@ export default function Home() {
         function (response: { authResponse: { accessToken: any } }) {
           if (response.authResponse) {
             const accessToken = response.authResponse.accessToken;
+            const accessToken1 = response.authResponse;
             console.log(accessToken); // Log the access token
+            console.log(accessToken1); // Log the access token
+            
           } else {
             console.log("User cancelled login or did not fully authorize.");
           }
