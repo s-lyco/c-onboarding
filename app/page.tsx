@@ -28,9 +28,9 @@ export default function Home() {
             appId: "650341763798014",
             autoLogAppEvents: true,
             xfbml: true,
-            version: "v13.0",
+            version: "v17.0",
           });
-          setFbLoaded(true); // Set the flag to indicate that the SDK has loaded
+          setFbLoaded(true); 
         };
       };
 
