@@ -2,6 +2,12 @@
 
 import { useEffect } from "react"; // Import the "useEffect" hook from the "react" library
 
+declare global {
+  interface Window {
+    fbAsyncInit: () => void;
+  }
+}
+
 export default function Home() {
   // Function to initialize the Facebook SDK
   const initFacebookSDK = () => {
