@@ -25,7 +25,7 @@ export default function Home() {
         // Initialize Facebook SDK
         window.fbAsyncInit = function () {
           window.FB.init({
-            appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+            appId: "650341763798014",
             autoLogAppEvents: true,
             xfbml: true,
             version: "v13.0",
