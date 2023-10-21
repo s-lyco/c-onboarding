@@ -77,15 +77,6 @@ export default function Home() {
         alignItems: "center",
       }}
     >
-      <Head>
-        <title>Facebook-Login</title>
-        <script
-          async
-          defer
-          crossOrigin="anonymous"
-          src="https://connect.facebook.net/en_US/sdk.js"
-        ></script>
-      </Head>
       <button
         onClick={launchWhatsAppSignup}
         style={{
