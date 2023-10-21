@@ -34,6 +34,9 @@ export default function Home() {
               xfbml: true,
               version: "v13.0",
             });
+
+            // Now that the SDK is initialized, you can call FB.login here if needed
+            launchWhatsAppSignup();
           };
         };
 
