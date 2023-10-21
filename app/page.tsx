@@ -11,11 +11,11 @@ declare global {
 export default function Home() {
   // Function to initialize the Facebook SDK
   const initFacebookSDK = () => {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       // Initialize the Facebook SDK when it's loaded
       window.fbAsyncInit = function () {
         window.FB.init({
-          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID, //  Facebook App ID
+          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID, // Facebook App ID
           autoLogAppEvents: true,
           xfbml: true,
           version: "v17.0", // Specify the SDK version
