@@ -1,76 +1,77 @@
-"use client"; // Import the "client" module (if available, this depends on the context)
-
-import { useEffect } from "react"; // Import the "useEffect" hook from the "react" library
+"use client";
+import { useEffect } from "react";
+import Head from "next/head";
 
 declare global {
   interface Window {
     fbAsyncInit: () => void;
+    FB: any;
   }
 }
 
 export default function Home() {
-  // Function to initialize the Facebook SDK
-  const initFacebookSDK = () => {
-    return new Promise<void>((resolve) => {
-      // Initialize the Facebook SDK when it's loaded
-      window.fbAsyncInit = function () {
-        window.FB.init({
-          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID, // Facebook App ID
-          autoLogAppEvents: true,
-          xfbml: true,
-          version: "v17.0", // Specify the SDK version
-        });
-        resolve(); // Resolve the promise when initialization is complete
-      };
-
-      // Load the Facebook SDK asynchronously
-      (function (d, s, id) {
-        var js: HTMLScriptElement,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js"; // SDK script URL
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
-    });
-  };
-
   useEffect(() => {
-    // Initialize the Facebook SDK when the component is mounted
-    const initializeSDK = async () => {
+    // Load Facebook SDK
+    const loadFacebookSDK = async () => {
       try {
-        await initFacebookSDK(); // Wait for the SDK initialization to complete
+        // Check if FB object exists, and if it does, don't load the SDK again
+        if (window.FB) {
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://connect.facebook.net/en_US/sdk.js";
+        script.async = true;
+        script.defer = true;
+        script.crossOrigin = "anonymous";
+
+        script.onload = () => {
+          // Initialize Facebook SDK
+          window.fbAsyncInit = function () {
+            window.FB.init({
+              appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+              autoLogAppEvents: true,
+              xfbml: true,
+              version: "v13.0",
+            });
+          };
+        };
+
+        document.head.appendChild(script);
       } catch (error) {
-        console.error("Error initializing Facebook SDK:", error);
+        console.error("Failed to load Facebook SDK", error);
       }
     };
 
-    initializeSDK();
-  }, []); // An empty dependency array ensures the effect runs once after the initial render
+    loadFacebookSDK();
+  }, []);
 
-  const launchWhatsAppSignup = () => {
-    // Launch Facebook login with WhatsApp permissions
-    window.FB.login(
-      function (response) {
-        if (response.authResponse) {
-          const accessToken = response.authResponse.accessToken;
-          console.log(accessToken); // Log the access token to the console
-        } else {
-          console.log("User cancelled login or did not fully authorize.");
-        }
-      },
-      {
-        scope: "whatsapp_business_management", // Request WhatsApp permissions
-        extras: {
-          feature: "whatsapp_embedded_signup",
-          setup: {
-            // ... Prefilled data can go here
-          },
+  // Facebook Login with JavaScript SDK
+  function launchWhatsAppSignup() {
+    if (window.FB) {
+      window.FB.login(
+        function (response: { authResponse: { accessToken: any } }) {
+          if (response.authResponse) {
+            const accessToken = response.authResponse.accessToken;
+            console.log(accessToken);
+          } else {
+            console.log("User cancelled login or did not fully authorize.");
+          }
         },
-      }
-    );
-  };
+        {
+          scope: "whatsapp_business_management",
+          extras: {
+            feature: "whatsapp_embedded_signup",
+            setup: {
+              // ... Prefilled data can go here
+            },
+          },
+        }
+      );
+    } else {
+      console.error("Facebook SDK is not available.");
+    }
+  }
 
   return (
     <div
@@ -82,15 +83,27 @@ export default function Home() {
         alignItems: "center",
       }}
     >
+      <Head>
+        <title>Facebook-Login</title>
+        <script
+          async
+          defer
+          crossOrigin="anonymous"
+          src="https://connect.facebook.net/en_US/sdk.js"
+        ></script>
+      </Head>
       <button
         onClick={launchWhatsAppSignup}
         style={{
           backgroundColor: "#1877f2",
-          borderRadius: "4px",
+          border: 0,
+          borderRadius: 4,
           color: "#fff",
           cursor: "pointer",
           fontFamily: "Helvetica, Arial, sans-serif",
-          fontSize: "20px",
+          fontSize: 16,
+          fontWeight: "bold",
+          height: 40,
           padding: "0 24px",
         }}
       >
